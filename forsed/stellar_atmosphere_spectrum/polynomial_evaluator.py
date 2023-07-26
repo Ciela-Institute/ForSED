@@ -19,7 +19,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
         
         self.coefficients = {}
-
+        self.wavelength = {}
+        self.beta = {}
         for file_name in glob.glob(str(data_path) + '/*.dat'):
             if 'polynomial_powers' in file_name:
                 with open(file_name, 'r') as f:
@@ -29,9 +30,11 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                     self.bounds = eval(f.read())
             else:
                 coeffs = pd.read_csv(file_name, delim_whitespace=True, comment='#')
-                self.coefficients[os.path.split(file_name)[-1][:-4]] = torch.tensor(coeffs.to_numpy())
-
-
+                name = os.path.split(file_name)[-1][:-4]
+                self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
+                self.wavelength[name] = torch.tensor(coeffs.to_numpy()[:,0], dtype = torch.float64)
+                self.beta[name] = torch.tensor(coeffs.to_numpy()[:,1], dtype = torch.float64)
+                
     def get_spectrum(self, surface_gravity, metalicity, effective_temperature) -> torch.Tensor:
 
         for key, ranges in self.bounds.items():
@@ -41,7 +44,9 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
         X = torch.tensor(
             tuple(effective_temperature**c[0] * metalicity**c[1] * surface_gravity**c[2] for c in self.polynomial_powers[stellar_type])
-        )
+        , dtype = torch.float64)
+        print(self.coefficients[stellar_type].shape)
+        print(X.shape)
         spectrum = self.coefficients[stellar_type] @ X
 
         return spectrum
