@@ -28,6 +28,10 @@ class MIST(Isochrone):
 
             ages = [round(x, 2) for x in isochrone.ages]
 
+        self.metallicities = torch.tensor(list[sorted(metallicities)])
+        self.ages          = torch.tensor(ages)
+
+
         metallicities_order = np.argsort(metallicities)
 
         for n, isochrone_file in enumerate(isochrone_files): 
