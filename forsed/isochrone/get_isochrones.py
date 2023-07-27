@@ -34,6 +34,8 @@ def get_mist_isochrones(url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.
         with open(file_path, 'w') as f:
             f.write(r.text)
 
+    ## Still need to figure out how to extrat the .txz files
+
 
 if __name__=='__main__':
 

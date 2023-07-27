@@ -3,6 +3,8 @@ import os
 import glob
 from pathlib import Path
 
+import numpy as np
+
 
 
 import pandas as pd
@@ -14,50 +16,135 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
     def __init__(self):
 
-
         directory_path = Path().absolute()
         data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
 
         self.coefficients = {}
-        self.wavelength = {}
-        self.reference = {}
+        self.wavelength   = {}
+        self.reference    = {}
+
         for file_name in glob.glob(str(data_path) + '/*.dat'):
+            print(file_name)
+
             if 'polynomial_powers' in file_name:
+
                 with open(file_name, 'r') as f:
                     self.polynomial_powers = eval(f.read())
             elif "bounds" in file_name:
+
                 with open(file_name, 'r') as f:
                     self.bounds = eval(f.read())
             else:
                 coeffs = pd.read_csv(file_name, delim_whitespace=True, comment='#')
                 name = os.path.split(file_name)[-1][:-4]
-                self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
-                self.wavelength[name] = torch.tensor(coeffs.to_numpy()[:,0], dtype = torch.float64)
-                self.reference[name] = torch.tensor(coeffs.to_numpy()[:,1], dtype = torch.float64)
 
-    def get_spectrum(self, surface_gravity, metalicity, effective_temperature) -> torch.Tensor:
+                print(coeffs.shape)
+
+                self.wavelength[name]   = torch.tensor(coeffs.to_numpy()[:,0], dtype = torch.float64)
+                self.reference[name]    = torch.tensor(coeffs.to_numpy()[:,1], dtype = torch.float64)
+                self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
+
+
+    # def get_spectrum(self, surface_gravity, metalicity, effective_temperature) -> torch.Tensor:
+
+    #     for key, ranges in self.bounds.items():
+    #         if ranges["surface_gravity"][0] < surface_gravity < ranges["surface_gravity"][1] and ranges["effective_temperature"][0] < effective_temperature < ranges["effective_temperature"][1]:
+    #             stellar_type = key
+    #             break
+
+    #     X = torch.tensor(
+    #         tuple(effective_temperature**c[0] * metalicity**c[1] * surface_gravity**c[2] for c in self.polynomial_powers[stellar_type])
+    #     , dtype = torch.float64)
+    #     print(self.coefficients[stellar_type].shape)
+    #     print(X.shape)
+    #     log_flux = self.coefficients[stellar_type] @ X
+        
+    #     log_flux *= self.reference[stellar_type]
+
+    #     return self.wavelength[stellar_type], log_flux
+
+    def get_spectrum(self, logg, feh, teff) -> torch.Tensor:
+
+        print(logg, feh, teff)
+
+        
+        """
+        Setting up some boundaries
+        """
+        teff2 = teff
+        logg2 = logg
+        if teff2 <= 2800.:
+            teff2 = 2800
+        if logg2 < (-0.5):
+            logg2 = (-0.5)
+
+        # Normalizing to solar values
+        logt = np.log10(teff2) - 3.7617
+        logg = logg - 4.44
 
         for key, ranges in self.bounds.items():
-            if ranges["surface_gravity"][0] < surface_gravity < ranges["surface_gravity"][1] and ranges["effective_temperature"][0] < effective_temperature < ranges["effective_temperature"][1]:
-                stellar_type = key
-                break
+            # print(key, ranges)
 
-        X = torch.tensor(
-            tuple(effective_temperature**c[0] * metalicity**c[1] * surface_gravity**c[2] for c in self.polynomial_powers[stellar_type])
-        , dtype = torch.float64)
+            stellar_type = 'Hot_Stars'
+
+            X = torch.tensor(
+                                tuple(logt**c[0] * feh**c[1] * logg**c[2] for c in self.polynomial_powers[stellar_type]), 
+                                dtype = torch.float64
+                            )
+        
         print(self.coefficients[stellar_type].shape)
         print(X.shape)
-        log_flux = self.coefficients[stellar_type] @ X
 
+        log_flux = self.coefficients[stellar_type] @ X
         log_flux *= self.reference[stellar_type]
 
         return self.wavelength[stellar_type], log_flux
 
+
+
 if __name__ == "__main__":
     P = PolynomialEvaluator()
 
+    # import read_mist_models as read_mist
     import matplotlib.pyplot as plt
 
-    wave, flux = P.get_spectrum(3., 0., 4500)
-    plt.plot(wave, flux)
-    plt.show()
+    # isochrone = read_mist.ISO('../data/MIST/MIST_v1.2_vvcrit0.4_basic_isos/MIST_v1.2_feh_p0.00_afe_p0.0_vvcrit0.4_basic.iso')
+
+    # age = 10.0
+
+    # i = isochrone.age_index(age)
+    # j = ((isochrone.isos[i]['phase'] != 3) &
+    #     (isochrone.isos[i]['phase'] != 4) &
+    #     (isochrone.isos[i]['phase'] != 5) &
+    #     (isochrone.isos[i]['phase'] != 6))
+
+    # teff = isochrone.isos[i]['log_Teff'][j]
+    # logg = isochrone.isos[i]['log_g'][j]
+
+    feh = 0.0
+    teff = [7000]
+    logg = [4.0]
+
+    for i, (t, g) in enumerate(zip(teff, logg)):
+        fig = plt.figure(figsize=(12,6))
+        ax1 = plt.subplot(1,2,1)
+        ax2 = plt.subplot(1,2,2)
+        ax1.scatter(teff, logg, color='#999999', s=40)
+        ax1.set_xlim(3.8, 3.4)
+        ax1.set_ylim(5.5, -0.5)
+        
+        wave, flux = P.get_spectrum(g, feh, t)
+        # basis = spigen.Spectrum()    
+        # spec = basis.from_coefficients(10**t, g, feh)
+        ax1.scatter(t, g, color='#ef8a62', s=70)
+        ax2.plot(wave, flux, color='#ef8a62')
+        
+        ax1.set_xlabel('Temperature', fontsize=24)
+        ax1.set_ylabel('Surface Gravity', fontsize=24)
+        
+        ax2.set_xlabel('Wavelength', fontsize=24)
+        ax2.set_ylabel('Flux', fontsize=24)
+
+        plt.show()
+        
+    # wave, flux = P.get_spectrum(3., 0., 4500)
