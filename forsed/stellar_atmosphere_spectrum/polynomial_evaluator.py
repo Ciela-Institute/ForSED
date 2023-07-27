@@ -2,14 +2,16 @@
 import os
 import glob
 from pathlib import Path
+from time import process_time as time
 
 import numpy as np
 
 
 
-import pandas as pd
 
+import pandas as pd
 import torch
+
 from stellar_atmosphere_spectrum import Stellar_Atmosphere_Spectrum
 
 class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
@@ -30,6 +32,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
                 with open(file_name, 'r') as f:
                     self.polynomial_powers = eval(f.read())
+                    for key in self.polynomial_powers:
+                        self.polynomial_powers[key] = torch.tensor(self.polynomial_powers[key])
             elif "bounds" in file_name:
 
                 with open(file_name, 'r') as f:
@@ -58,7 +62,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
     #     print(self.coefficients[stellar_type].shape)
     #     print(X.shape)
     #     log_flux = self.coefficients[stellar_type] @ X
-        
+
     #     log_flux *= self.reference[stellar_type]
 
     #     return self.wavelength[stellar_type], log_flux
@@ -67,7 +71,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
         print(logg, feh, teff)
 
-        
+
         """
         Setting up some boundaries
         """
@@ -87,13 +91,10 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
             stellar_type = 'Hot_Stars'
 
-            X = torch.tensor(
-                                tuple(logt**c[0] * feh**c[1] * logg**c[2] for c in self.polynomial_powers[stellar_type]), 
-                                dtype = torch.float64
-                            )
-        
-        print(self.coefficients[stellar_type].shape)
-        print(X.shape)
+
+        K = torch.stack((torch.as_tensor(teff, dtype = torch.float64), torch.as_tensor(feh, dtype = torch.float64), torch.as_tensor(logg, dtype = torch.float64)))
+        PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
+        X = torch.prod(K**PP, dim = -1)
 
         log_flux = self.coefficients[stellar_type] @ X
         log_flux *= self.reference[stellar_type]
@@ -132,19 +133,26 @@ if __name__ == "__main__":
         ax1.scatter(teff, logg, color='#999999', s=40)
         ax1.set_xlim(3.8, 3.4)
         ax1.set_ylim(5.5, -0.5)
-        
+
         wave, flux = P.get_spectrum(g, feh, t)
-        # basis = spigen.Spectrum()    
+        # basis = spigen.Spectrum()
         # spec = basis.from_coefficients(10**t, g, feh)
         ax1.scatter(t, g, color='#ef8a62', s=70)
         ax2.plot(wave, flux, color='#ef8a62')
-        
+
         ax1.set_xlabel('Temperature', fontsize=24)
         ax1.set_ylabel('Surface Gravity', fontsize=24)
-        
+
         ax2.set_xlabel('Wavelength', fontsize=24)
         ax2.set_ylabel('Flux', fontsize=24)
 
         plt.show()
-        
-    # wave, flux = P.get_spectrum(3., 0., 4500)
+
+
+
+    start = time()
+    wave, flux = P.get_spectrum(3., 0., 4500)
+    fin = time() - start
+    print("runtime: ", fin)
+    plt.plot(wave, flux)
+    plt.show()

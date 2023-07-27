@@ -1,4 +1,6 @@
-class Isochrone(object):
+from abc import ABC, abstractmethod
+
+class Isochrone(ABC):
 
     @abstractmethod
     def get_isochrone(self, metalicity, Tage, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
