@@ -4,7 +4,7 @@ import glob
 from pathlib import Path
 
 
-
+from time import process_time as time
 import pandas as pd 
 
 import torch
@@ -25,6 +25,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
             if 'polynomial_powers' in file_name:
                 with open(file_name, 'r') as f:
                     self.polynomial_powers = eval(f.read())
+                    for key in self.polynomial_powers:
+                        self.polynomial_powers[key] = torch.tensor(self.polynomial_powers[key])
             elif "bounds" in file_name:
                 with open(file_name, 'r') as f:
                     self.bounds = eval(f.read())
@@ -42,18 +44,20 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                 stellar_type = key
                 break
 
-        X = torch.tensor(
-            tuple(effective_temperature**c[0] * metalicity**c[1] * surface_gravity**c[2] for c in self.polynomial_powers[stellar_type])
-        , dtype = torch.float64)
-        print(self.coefficients[stellar_type].shape)
-        print(X.shape)
+        K = torch.stack((torch.as_tensor(effective_temperature, dtype = torch.float64), torch.as_tensor(metalicity, dtype = torch.float64), torch.as_tensor(10**surface_gravity, dtype = torch.float64)))
+        PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
+        X = torch.prod(K**PP, dim = -1)
         spectrum = self.coefficients[stellar_type] @ X
 
-        return spectrum
+        return self.wavelength[stellar_type], spectrum
 
 if __name__ == "__main__":
     P = PolynomialEvaluator()
 
     import matplotlib.pyplot as plt
-    plt.plot(P.get_spectrum(3., 0., 4500))
+    start = time()
+    wave, spec = P.get_spectrum(3., 0., 4500)
+    fin = time() - start
+    print("runtime: ", fin)
+    plt.plot(wave, spec)
     plt.show()
