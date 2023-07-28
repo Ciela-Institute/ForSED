@@ -23,9 +23,6 @@ class Basic_SSP():
 
         isochrone = self.isochrone.get_isochrone(metalicity, Tage)
 
-        # plt.scatter(isochrone['Teff'], isochrone['log_g'])
-        # plt.show()
-
         # Main Sequence isochrone integration
         CHOOSE = isochrone["phase"] <= 2
         spectra = torch.stack(tuple(
