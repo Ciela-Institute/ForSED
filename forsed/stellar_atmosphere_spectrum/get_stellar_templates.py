@@ -19,7 +19,6 @@ def get_polynomial_coefficients_villaume2017a():
     try:
         os.mkdir(data_path)
     except Exception as e:
-        print(e)
         pass
 
     for regime in stellar_types:
