@@ -46,11 +46,11 @@ def get_polynomial_coefficients_villaume2017a():
 
 
     B = {
-        "Cool_Dwarfs": {"surface_gravity": (-0.5, 3.5), "effective_temperature": (2500,4000)},
-        "Cool_Giants": {"surface_gravity": (3.5, 6),    "effective_temperature": (2500,4000)},
-        "Warm_Dwarfs": {"surface_gravity": (-0.5, 3.5), "effective_temperature": (4000,6000)},
-        "Warm_Giants": {"surface_gravity": (3.5, 6),    "effective_temperature": (4000,6000)},
-        "Hot_Stars": {"surface_gravity":   (-0.5, 6),   "effective_temperature": (6000,12000)},
+        "Cool_Dwarfs": {"surface_gravity": (4.0, 6.0),  "effective_temperature": (2500,4000)},
+        "Cool_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (2500,4000)},
+        "Warm_Dwarfs": {"surface_gravity": (4.0, 6.0),  "effective_temperature": (4000,6000)},
+        "Warm_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (4000,6000)},
+        "Hot_Stars":   {"surface_gravity": (-0.5, 6),   "effective_temperature": (6000,12000)},
     }
 
     with open(os.path.join(data_path, 'bounds.dat'), "w") as f: 
