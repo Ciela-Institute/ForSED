@@ -73,5 +73,6 @@ if __name__ == "__main__":
     fin = time() - start
     print("runtime: ", fin)
 
-    plt.plot(ssp.sas.wavelength, spec)
+    i = (ssp.sas.wavelength >= 0.36)
+    plt.plot(ssp.sas.wavelength[i], spec[i])
     plt.show()
