@@ -4,6 +4,8 @@ import utils
 
 from time import process_time as time
 
+import matplotlib.pyplot as plt
+
 class Basic_SSP():
 
     def __init__(
@@ -20,14 +22,17 @@ class Basic_SSP():
     def forward(self, metalicity, Tage, alpha) -> torch.Tensor:
 
         isochrone = self.isochrone.get_isochrone(metalicity, Tage)
-        
+
+        # plt.scatter(isochrone['Teff'], isochrone['log_g'])
+        # plt.show()
+
         # Main Sequence isochrone integration
         CHOOSE = isochrone["phase"] <= 2
         spectra = torch.stack(tuple(
             self.sas.get_spectrum(
-                lg,
+               tf,
+               lg,
                 metalicity,
-                tf,
             ) for lg, tf in zip(isochrone["log_g"][CHOOSE], isochrone["Teff"][CHOOSE])
         )).T
         spectrum = torch.zeros(spectra.shape[0])
@@ -42,9 +47,9 @@ class Basic_SSP():
         CHOOSE = torch.logical_and(isochrone["phase"] > 2, isochrone["phase"] <= 5)
         spectra = torch.stack(tuple(
             self.sas.get_spectrum(
+                tf,
                 lg,
                 metalicity,
-                tf,
             ) for lg, tf in zip(isochrone["log_g"][CHOOSE], isochrone["Teff"][CHOOSE])
         )).T
         spectrum += torch.vmap(partial(torch.trapz, x = isochrone["initial_mass"][CHOOSE]))(
@@ -56,7 +61,7 @@ class Basic_SSP():
 
         # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
         spectrum *= utils.light_speed/self.sas.wavelength**2
-        
+
         return spectrum
 
 if __name__ == "__main__":
@@ -70,6 +75,6 @@ if __name__ == "__main__":
     spec = ssp.forward(torch.tensor(0.), torch.tensor(9.), torch.tensor([1.3, 2.3, 2.7]))
     fin = time() - start
     print("runtime: ", fin)
-    import matplotlib.pyplot as plt
-    plt.plot(spec)
+
+    plt.plot(ssp.sas.wavelength, spec)
     plt.show()

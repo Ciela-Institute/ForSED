@@ -63,28 +63,27 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         """
         Setting up some boundaries
         """
+
         teff2 = teff
         logg2 = logg
         if teff2 <= 2800.:
-            teff2 = 2800
+            teff2 = torch.tensor(2800)
         if logg2 < (-0.5):
-            logg2 = (-0.5)
+            logg2 = torch.tensor(-0.5)
 
         # Normalizing to solar values
-        logt = np.log10(teff2) - 3.7617
+        # logt = np.log10(teff2) - 3.7617
+        logt = np.log10(teff) - 3.7617
         logg = logg - 4.44
 
-        print(logt, logg, feh)
-        # stellar_type = 'Hot_Stars'
-
-
         for key, ranges in self.bounds.items():
-            if ranges["surface_gravity"][0] < logg2 < ranges["surface_gravity"][1] and ranges["effective_temperature"][0] < teff2 < ranges["effective_temperature"][1]:
+            if ranges["surface_gravity"][0] <= logg2 <= ranges["surface_gravity"][1] and ranges["effective_temperature"][0] <= teff2 <= ranges["effective_temperature"][1]:
                 stellar_type = key
                 break
             
-        print(stellar_type)
-        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), torch.as_tensor(feh, dtype = torch.float64), torch.as_tensor(logg, dtype = torch.float64)))
+        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), 
+                          torch.as_tensor(feh, dtype = torch.float64), 
+                          torch.as_tensor(logg, dtype = torch.float64)))
         PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
         X  = torch.prod(K**PP, dim = -1)
 

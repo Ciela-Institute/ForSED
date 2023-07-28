@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    teff = 5110.1831261806437
-    logg = 1.1249530724684771
+    teff = 2500.1831261806437
+    logg = -0.6
     feh  = 0.0
 
     P = PolynomialEvaluator()
@@ -29,5 +29,4 @@ if __name__ == "__main__":
     plt.plot(P.wavelength[i], sas[i], label='polynomial_evaluator')
 
     plt.legend()
-
     plt.show()
