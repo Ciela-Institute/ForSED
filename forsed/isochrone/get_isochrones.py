@@ -27,6 +27,9 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.4_basic_isos.txz', url=
     if not os.path.exists(os.path.splitext(file_path)[0]):
         print("Getting MIST")
         r = requests.get(url.format(iso_version))
+
+        with open(file_path, 'w') as f:
+            f.write(r.text)
         print("Writing MIST")
         with open(file_path, 'wb') as f:
             f.write(r.content)
