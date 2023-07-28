@@ -11,9 +11,9 @@ from glob import glob
 
 import h5py
 import numpy as np
-from .read_mist_models import ISO
+from read_mist_models import ISO
 
-def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.4_basic_isos.txz', url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.2/{}'):
+def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.2/{}'):
 
     # Collect isochrone data from the internet
     ######################################################################
