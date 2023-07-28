@@ -1,10 +1,10 @@
 import torch
 from functools import partial
-import utils
-
 from time import process_time as time
 
 import matplotlib.pyplot as plt
+
+from .. import utils
 
 class Basic_SSP():
 

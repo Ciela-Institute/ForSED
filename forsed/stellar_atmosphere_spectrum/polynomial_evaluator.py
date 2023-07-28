@@ -62,7 +62,6 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
             if ranges["surface_gravity"][0] <= logg2 <= ranges["surface_gravity"][1] and ranges["effective_temperature"][0] <= teff2 <= ranges["effective_temperature"][1]:
                 stellar_type = key
                 break
-        print(stellar_type + '\n')
             
         K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), 
                           torch.as_tensor(feh,  dtype = torch.float64), 
