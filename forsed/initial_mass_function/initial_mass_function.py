@@ -1,6 +1,7 @@
+from abc import ABC, abstractmethod
+from torch import Tensor
 
-@ABC
-class Initial_Mass_Function():
+class Initial_Mass_Function(ABC):
 
     @abstractmethod
     def get_weight(self, mass) -> Tensor:

@@ -1,7 +1,10 @@
+import torch
+
+from initial_mass_function import Initial_Mass_Function
 
 class Kroupa(Initial_Mass_Function):
 
-    def get_weight(self, mass, alpha) -> Tensor:
+    def get_weight(self, mass, alpha) -> torch.Tensor:
 
         weight = torch.where(
             mass < 0.5,
@@ -14,3 +17,15 @@ class Kroupa(Initial_Mass_Function):
         )
 
         return weight
+
+if __name__ == "__main__":
+
+    import matplotlib.pyplot as plt
+    K = Kroupa()
+
+    M = torch.linspace(0.1, 100, 1000)
+    W = K.get_weight(M, torch.tensor([1.3, 2.3, 2.7]))
+
+    plt.plot(torch.log10(M), torch.log10(W))
+    plt.show()
+    

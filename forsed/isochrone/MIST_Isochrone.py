@@ -15,22 +15,16 @@ class MIST(Isochrone):
 
         isochrone_grid = torch.zeros(len(isochrone_files), 107, 5, 1700)
 
-
         metallicities = []
         for isochrone_file in isochrone_files: 
 
             isochrone = read_mist.ISO(isochrone_file, verbose=False)
-
-
             metallicities.append(isochrone.abun['[Fe/H]'])
-
-
 
             ages = [round(x, 2) for x in isochrone.ages]
 
         self.metallicities = torch.tensor(list[sorted(metallicities)])
         self.ages          = torch.tensor(ages)
-
 
         metallicities_order = np.argsort(metallicities)
 
@@ -38,16 +32,12 @@ class MIST(Isochrone):
 
             isochrone = read_mist.ISO(isochrone_file, verbose=False)
 
-
             loggs = []
             teffs = []
             log_Ls = []
             initial_masses = [] 
             phases = []
             for x, age in enumerate(isochrone.ages):
-
-
-
                 i = isochrone.age_index(age)
 
                 j = np.where((isochrone.isos[i]['phase'] != 6) &
@@ -63,11 +53,6 @@ class MIST(Isochrone):
                 isochrone_grid[metallicities_order[n], i, 4][:something] = torch.tensor(isochrone.isos[i]['log_L'][j])
                 
         self.isochrone_grid = isochrone_grid
-
-
-
-
-
 
     def get_isochrone(self, metalicity, Tage, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
         pass 
