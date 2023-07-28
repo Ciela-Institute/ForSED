@@ -39,25 +39,6 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                 self.reference[name]    = torch.tensor(coeffs.to_numpy()[:,1], dtype  = torch.float64)
                 self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
 
-
-    # def get_spectrum(self, surface_gravity, metalicity, effective_temperature) -> torch.Tensor:
-
-    #     for key, ranges in self.bounds.items():
-    #         if ranges["surface_gravity"][0] < surface_gravity < ranges["surface_gravity"][1] and ranges["effective_temperature"][0] < effective_temperature < ranges["effective_temperature"][1]:
-    #             stellar_type = key
-    #             break
-    #     else:
-    #         stellar_type = "Warm_Giants"
-
-    #     K = torch.stack((torch.as_tensor(effective_temperature, dtype = torch.float64), torch.as_tensor(metalicity, dtype = torch.float64), torch.as_tensor(surface_gravity, dtype = torch.float64)))
-    #     PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
-    #     X = torch.prod(K**PP, dim = -1)
-    #     log_flux = self.coefficients[stellar_type] @ X
-
-    #     log_flux *= self.reference[stellar_type]
-
-    #     return log_flux
-
     def get_spectrum(self, teff, logg, feh) -> torch.Tensor:
 
         """
@@ -84,7 +65,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
             stellar_type = "Warm_Giants"
             
         K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), 
-                          torch.as_tensor(feh, dtype = torch.float64), 
+                          torch.as_tensor(feh,  dtype = torch.float64), 
                           torch.as_tensor(logg, dtype = torch.float64)))
         PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
         X  = torch.prod(K**PP, dim = -1)

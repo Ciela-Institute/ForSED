@@ -37,7 +37,7 @@ class Basic_SSP():
             (spectra * self.imf.get_weight(
                 isochrone["initial_mass"][CHOOSE],
                 alpha,
-            ) * isochrone["log_l"][CHOOSE]),
+            ) * 10**isochrone["log_l"][CHOOSE]),
         )
 
         # Horizontal Branch isochrone integration
@@ -53,7 +53,7 @@ class Basic_SSP():
             (spectra * self.imf.get_weight(
                 isochrone["initial_mass"][CHOOSE],
                 alpha,
-            ) * isochrone["log_l"][CHOOSE]),
+            ) * 10**isochrone["log_l"][CHOOSE]),
         )
 
         # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
