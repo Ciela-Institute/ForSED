@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    teff = 4110.1831261806437
-    logg = 4.1249530724684771
+    teff = 5110.1831261806437
+    logg = 1.1249530724684771
     feh  = 0.0
 
     P = PolynomialEvaluator()
