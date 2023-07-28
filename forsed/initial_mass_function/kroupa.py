@@ -1,6 +1,8 @@
 import torch
 
-from initial_mass_function import Initial_Mass_Function
+from .initial_mass_function import Initial_Mass_Function
+
+__all__ = ("Kroupa", )
 
 class Kroupa(Initial_Mass_Function):
 

@@ -2,26 +2,30 @@ import glob
 from re import M 
 
 import matplotlib.pyplot as plt
-
+from pathlib import Path
+import os
 import numpy as np
-import read_mist_models as read_mist
+from .read_mist_models import ISO
 
-from isochrone import Isochrone
+from .isochrone import Isochrone
 
 import torch 
+
+__all__ = ("MIST", )
 
 class MIST(Isochrone):
 
     def __init__(self):
-
-        isochrone_files = glob.glob('/Users/alexa/ForSED/forsed/data/MIST/MIST_v1.2_vvcrit0.4_basic_isos/*')
-
+        directory_path = Path(__file__).parent
+        data_path      = Path(directory_path.parent, 'data/MIST/')
+        
+        isochrone_files = glob.glob(os.path.join(data_path, 'MIST_v1.2_vvcrit0.4_basic_isos/*.iso'))
         isochrone_grid = torch.zeros(len(isochrone_files), 107, 5, 1700) - 999
 
         metallicities = []
         for isochrone_file in isochrone_files: 
 
-            isochrone = read_mist.ISO(isochrone_file, verbose=False)
+            isochrone = ISO(isochrone_file, verbose=False)
             metallicities.append(isochrone.abun['[Fe/H]'])
 
             ages = [round(x, 2) for x in isochrone.ages]
@@ -34,7 +38,7 @@ class MIST(Isochrone):
 
         for n, isochrone_file in enumerate(isochrone_files): 
 
-            isochrone = read_mist.ISO(isochrone_file, verbose=False)
+            isochrone = ISO(isochrone_file, verbose=False)
 
             loggs = []
             teffs = []
@@ -63,7 +67,6 @@ class MIST(Isochrone):
         metallicity_index = torch.clamp(torch.sum(self.metallicities < metallicity) - 1, 0) 
         age_index = torch.clamp(torch.sum(self.ages < age) - 1, 0) # TO-DO: figure out a better way later
 
-        print(metallicity_index, age_index)
 
         isochrone = self.isochrone_grid[metallicity_index, age_index]
 
