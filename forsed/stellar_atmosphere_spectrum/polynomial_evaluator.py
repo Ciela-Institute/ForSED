@@ -135,8 +135,6 @@ if __name__ == "__main__":
         ax1.set_ylim(5.5, -0.5)
 
         wave, flux = P.get_spectrum(g, feh, t)
-        # basis = spigen.Spectrum()
-        # spec = basis.from_coefficients(10**t, g, feh)
         ax1.scatter(t, g, color='#ef8a62', s=70)
         ax2.plot(wave, flux, color='#ef8a62')
 
