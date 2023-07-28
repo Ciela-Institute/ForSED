@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    teff = 3110.1831261806437
+    teff = 5110.1831261806437
     logg = 3.1249530724684771
     feh  = 0.0
 
