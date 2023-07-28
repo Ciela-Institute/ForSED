@@ -15,20 +15,19 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     teff = 3110.1831261806437
-    logg = 5.1249530724684771
+    logg = 3.1249530724684771
     feh  = 0.0
 
     P = PolynomialEvaluator()
-    sas = P.get_spectrum(logg, feh, teff)
-
-
+    sas = P.get_spectrum(teff, logg, feh)
 
     spec = spigen.Spectrum()
     spec = spec.from_coefficients(teff, logg, feh)
 
-
     i = (P.wavelength >= 0.36)
-    plt.plot(P.wavelength[i], sas[i])
-    plt.plot(spec['wave'], spec['flux'], color='k')
+    plt.plot(spec['wave'], spec['flux'], color='k', lw=3, label='SPI_Utils')
+    plt.plot(P.wavelength[i], sas[i], label='polynomial_evaluator')
+
+    plt.legend()
 
     plt.show()

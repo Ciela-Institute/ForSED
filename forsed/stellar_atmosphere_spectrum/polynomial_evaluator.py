@@ -6,9 +6,6 @@ from time import process_time as time
 
 import numpy as np
 
-
-
-
 import pandas as pd
 import torch
 
@@ -38,8 +35,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                 coeffs = pd.read_csv(file_name, delim_whitespace=True, comment='#')
                 name = os.path.split(file_name)[-1][:-4]
 
-                self.wavelength         = torch.tensor(coeffs.to_numpy()[:,0], dtype = torch.float64)
-                self.reference[name]    = torch.tensor(coeffs.to_numpy()[:,1], dtype = torch.float64)
+                self.wavelength         = torch.tensor(coeffs.to_numpy()[:,0], dtype  = torch.float64)
+                self.reference[name]    = torch.tensor(coeffs.to_numpy()[:,1], dtype  = torch.float64)
                 self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
 
 
@@ -77,16 +74,18 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         logt = np.log10(teff2) - 3.7617
         logg = logg - 4.44
 
+        print(logt, logg, feh)
+
         stellar_type = 'Cool_Giants'
             
-        K  = torch.stack((torch.as_tensor(np.log10(teff), dtype = torch.float64), torch.as_tensor(feh, dtype = torch.float64), torch.as_tensor(logg, dtype = torch.float64)))
+        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), torch.as_tensor(feh, dtype = torch.float64), torch.as_tensor(logg, dtype = torch.float64)))
         PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
         X  = torch.prod(K**PP, dim = -1)
 
-        log_flux = self.coefficients[stellar_type] @ X
-        log_flux *= self.reference[stellar_type]
+        flux = np.exp(self.coefficients[stellar_type] @ X)
+        flux *= self.reference[stellar_type]
 
-        return log_flux
+        return flux
 
 
 
