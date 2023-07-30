@@ -14,7 +14,7 @@ __all__ = ("MIST", )
 
 class MIST(Isochrone):
 
-    def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.4_basic_isos.hdf5'):
+    def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.0_basic_isos.hdf5'):
         directory_path = Path(__file__).parent
         data_path      = Path(directory_path.parent, 'data/MIST/')
 
