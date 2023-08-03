@@ -12,7 +12,7 @@ from glob import glob
 
 import h5py
 import numpy as np
-from read_mist_models import ISO
+from .read_mist_models import ISO
 
 __all__ = ("get_mist_isochrones", )
 

@@ -4,12 +4,12 @@ import os
 import torch
 
 sys.path.insert(0, os.path.split(os.path.split(__file__)[0])[0])
-import forsed
+import lighthouse as lh
 
 class TestMIST(unittest.TestCase):
     def test_mist(self):
 
-        I = forsed.isochrone.MIST()
+        I = lh.isochrone.MIST()
         iso = I.get_isochrone(torch.tensor(0., dtype = torch.float64), torch.tensor(8.,dtype = torch.float64))
 
         for key in ["log_g", "Teff", "initial_mass"]:
