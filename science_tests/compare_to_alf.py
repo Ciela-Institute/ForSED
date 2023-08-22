@@ -30,7 +30,7 @@ def grab_alf_ssp(age=11.0, mcut=0.08, Z=+0.0):
 if __name__=='__main__':
 
 
-    alf_ssps = grab_alf_ssp()
+    # alf_ssps = grab_alf_ssp()
 
     S = forsed.SSP.Basic_SSP(
         forsed.isochrone.MIST(),
@@ -38,13 +38,17 @@ if __name__=='__main__':
         forsed.stellar_atmosphere_spectrum.PolynomialEvaluator(),
     )
 
-    ssp = S.forward(torch.tensor(0., dtype = torch.float64), torch.tensor(13.5, dtype = torch.float64), torch.tensor([1.3, 2.3, 2.7]))
 
-    plt.plot(alf_ssps['wavelength']*1e-4, alf_ssps['kroupa'], color='k')
+    print(S.imf)
+    # ssp = S.forward(torch.tensor(0., dtype = torch.float64), 
+    #                 torch.tensor(13.5, dtype = torch.float64), 
+    #                 torch.tensor([1.3, 2.3, 2.3]))
 
-    plt.plot(S.sas.wavelength, ssp)
-    plt.show()
+    # plt.plot(alf_ssps['wavelength']*1e-4, alf_ssps['kroupa'], color='k')
+
+    # plt.plot(S.sas.wavelength, ssp)
+    # plt.show()
 
 
-    print(ssp.shape)
-    print(alf_ssps.shape)
+    # print(ssp.shape)
+    # print(alf_ssps.shape)

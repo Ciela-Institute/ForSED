@@ -25,9 +25,11 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     K = Kroupa()
 
-    M = torch.linspace(0.1, 100, 1000)
-    W = K.get_weight(M, torch.tensor([1.3, 2.3, 2.7]))
+    M = torch.linspace(0.08, 100, 1000)
+    W = K.get_weight(M, torch.tensor([1.3, 2.3, 2.3]))
 
-    plt.plot(torch.log10(M), torch.log10(W))
-    plt.show()
+    print(W)
+
+    # plt.plot(torch.log10(M), torch.log10(W))
+    # plt.show()
     

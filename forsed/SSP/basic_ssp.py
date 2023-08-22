@@ -62,17 +62,19 @@ class Basic_SSP():
         return spectrum
 
 if __name__ == "__main__":
-    from isochrone import MIST
-    from initial_mass_function import Kroupa
-    from stellar_atmosphere_spectrum import PolynomialEvaluator
 
-    ssp = Basic_SSP(MIST(), Kroupa(), PolynomialEvaluator())
+    pass
+    # from isochrone import MIST
+    # from initial_mass_function import Kroupa
+    # from stellar_atmosphere_spectrum import PolynomialEvaluator
 
-    start = time()
-    spec = ssp.forward(torch.tensor(0.), torch.tensor(9.), torch.tensor([1.3, 2.3, 2.7]))
-    fin = time() - start
-    print("runtime: ", fin)
+    # ssp = Basic_SSP(MIST(), Kroupa(), PolynomialEvaluator())
 
-    i = (ssp.sas.wavelength >= 0.36)
-    plt.plot(ssp.sas.wavelength[i], spec[i])
-    plt.show()
+    # start = time()
+    # spec = ssp.forward(torch.tensor(0.), torch.tensor(9.), torch.tensor([1.3, 2.3, 2.7]))
+    # fin = time() - start
+    # print("runtime: ", fin)
+
+    # i = (ssp.sas.wavelength >= 0.36)
+    # plt.plot(ssp.sas.wavelength[i], spec[i])
+    # plt.show()
