@@ -16,7 +16,7 @@ def get_polynomial_coefficients_villaume2017a():
 
 
     directory_path = Path().absolute()
-    data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
+    data_path      = Path(directory_path, 'lighthouse/data/Villaume2017a/')
 
     try:
         os.mkdir(data_path)
