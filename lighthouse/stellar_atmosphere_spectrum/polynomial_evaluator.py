@@ -57,7 +57,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         logt = np.log10(teff) - 3.7617
         logg = logg - 4.44
 
-        print(logg2, teff2)
+        # print(logg2, teff2)
         for key, ranges in self.bounds.items():
             if ranges["surface_gravity"][0] <= logg2 <= ranges["surface_gravity"][1] and ranges["effective_temperature"][0] <= teff2 <= ranges["effective_temperature"][1]:
                 stellar_type = key

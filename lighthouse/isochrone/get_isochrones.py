@@ -26,7 +26,6 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
 
     # Path to where MIST data will live
     directory_path = Path().absolute()
-    print(directory_path)
     data_path      = Path(directory_path, 'lighthouse/data/MIST/')
 
     # Ensure the directoty exists to place the files
@@ -84,7 +83,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
             
     metallicities = np.array(list(sorted(metallicities)))
     ages          = np.array(ages)
-    isochrone_grid = np.zeros((len(isochrone_files), len(ages), 5, longest_track)) - 999
+    isochrone_grid = np.zeros((len(isochrone_files), len(ages), 6, longest_track)) - 999
     metallicities_order = np.argsort(metallicities)
 
     # Go through the isochrone files and collect all the data
@@ -106,6 +105,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
             isochrone_grid[metallicities_order[n], i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'][j])
             isochrone_grid[metallicities_order[n], i, 3][:track_length] = np.array(isochrone.isos[i]['phase'][j])
             isochrone_grid[metallicities_order[n], i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'][j])
+            isochrone_grid[metallicities_order[n], i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'][j])
 
     # Write the isochrones to a database
     ######################################################################
@@ -123,7 +123,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
         data_ages.attrs["description"] = "For the ages axis of the isochrone_grid, this is the associated ages"
 
         dt = h5py.special_dtype(vlen=str)
-        params = ["log_g", "Teff", "initial_mass", "phase", "log_l"]
+        params = ["log_g", "Teff", "initial_mass", "phase", "log_l", "current_mass"]
         data_params = f.create_dataset("parameters", (len(params), ), dtype = dt)
         data_params[:] = params
         data_params.attrs["description"] = "For the parameters axis of the isochrone_grid, this lists the relevant parameters in the correct order"
