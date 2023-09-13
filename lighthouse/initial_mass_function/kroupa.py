@@ -1,8 +1,5 @@
 import torch
 
-from scipy.integrate import quad
-import numpy as np
-
 
 from .initial_mass_function import Initial_Mass_Function
 
@@ -29,18 +26,6 @@ class Kroupa(Initial_Mass_Function):
             return mass*imf
         else:
             return imf
-        
-    def get_weight(self, mass, ) -> torch.Tensor:
-        imf_lower_limit = 0.08
-        imf_upper_limit = 100.
-
-        total_mass_weighted_imf, error =  quad(self.get_imf, 
-                                               imf_lower_limit, 
-                                               imf_upper_limit, 
-                                               args=(True,) )
-        
-        return self.get_imf(mass)/total_mass_weighted_imf
-
 
     
 if __name__ == "__main__":

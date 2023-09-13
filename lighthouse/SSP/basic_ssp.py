@@ -22,69 +22,18 @@ class Basic_SSP():
         self.imf = imf
         self.sas = sas
 
-        self.spectrum     = None
-        self.formed_mass  = None
-        self.stellar_mass = None
-
-    # def get_weight(self) -> torch.Tensor:
-
-    #     return None
-
-    def get_stellar_mass(self,  isochrone) -> torch.Tensor:
-
-        # !compute IMF-weighted mass of the SSP
-        # mass_ssp(ii) = SUM(wght(1:nmass(i))*mact(i,1:nmass(i)))
-
-
-        pop_masses = isochrone["initial_mass"]
-        imf_lower_limit = 0.08
-        imf_upper_limit = 100.
-            
-        weights = []
-        for i, mass in enumerate(pop_masses):
-            if pop_masses[i] < imf_lower_limit or pop_masses[i] > imf_upper_limit:
-                print("Bounds of isochrone exceed limits of full IMF")
-            if i == 0:
-                m1 = pop_masses[i]
-            else:
-                m1 = pop_masses[i] - 0.5*(pop_masses[i] - pop_masses[i-1])
-            if i == len(pop_masses) - 1:
-                m2 = pop_masses[i]
-            else:
-                m2 = pop_masses[i] + 0.5*(pop_masses[i+1] - pop_masses[i])
-            
-            if m2 < m1:
-                # print "IMF_WEIGHT WARNING: non-monotonic mass!", m1, m2, m2-m1
-                continue 
-            
-            if m2 == m1:
-                # print("m2 == m1")
-                continue
-
-            tmp, error =  quad(self.imf.get_imf, 
-                                m1, 
-                                m2, 
-                                args=(False,) )
-            weights.append(tmp)
-
-        weights = np.asarray(weights)
-
-        total_imf, error =  quad(self.imf.get_imf, 
-                                        imf_lower_limit, 
-                                        imf_upper_limit, 
-                                        args=(False,) )
-
-        imf_weight = weights/total_imf
-    
-
-        self.stellar_mass = (torch.sum(isochrone["current_mass"]*imf_weight))
 
     def forward(self, metalicity, Tage, alpha) -> torch.Tensor:
 
         isochrone = self.isochrone.get_isochrone(metalicity, Tage)
-        self.get_stellar_mass(isochrone)
 
+        plt.hist(isochrone["phase"])
+        plt.show()
 
+        plt.plot(isochrone["Teff"], isochrone["log_g"])
+        plt.xlim(8000, 3000)
+        plt.ylim(6, -1)
+        plt.show()
 
         # Main Sequence isochrone integration
         CHOOSE = isochrone["phase"] <= 2
@@ -99,6 +48,11 @@ class Basic_SSP():
 
         spectrum = torch.zeros(spectra.shape[0])
 
+
+        ms_weights = np.array([self.imf.get_weight(mass) for mass in isochrone["initial_mass"][CHOOSE]])
+        # print(np.sum(ms_weights))
+
+
         spectrum += torch.vmap(partial(torch.trapz, x = isochrone["initial_mass"][CHOOSE]))(
             ( (spectra * 10**isochrone["log_l"][CHOOSE]) * self.imf.get_weight(
                 isochrone["initial_mass"][CHOOSE]
@@ -107,8 +61,10 @@ class Basic_SSP():
 
 
 
+
         # Horizontal Branch isochrone integration
         CHOOSE = torch.logical_and(isochrone["phase"] > 2, isochrone["phase"] <= 5)
+
 
         spectra = torch.stack(tuple(
             self.sas.get_spectrum(
@@ -124,6 +80,9 @@ class Basic_SSP():
             ) ),
         )
 
+
+        hb_weights = np.array([self.imf.get_weight(mass) for mass in isochrone["initial_mass"][CHOOSE]])
+        # print(np.sum(hb_weights))
 
 
         # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
