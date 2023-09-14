@@ -26,7 +26,9 @@ class MIST(Isochrone):
 
     def get_isochrone(self, metallicity, age, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
 
-        metallicity_index = torch.clamp(torch.sum(self.metallicities < metallicity) - 1, 0) 
+
+
+        metallicity_index = torch.clamp(torch.sum(self.metallicities < metallicity) - 1, 0)
         age_index = torch.clamp(torch.sum(self.ages < age) - 1, 0) # TODO: figure out a better way later
 
         isochrone = self.isochrone_grid[metallicity_index, age_index]
