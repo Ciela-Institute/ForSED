@@ -9,7 +9,10 @@ import lighthouse as lh
 
 class TestIMF(unittest.TestCase):
 
-    def test_weights(self):
+    def test_t0_normalization(self):
+        """
+        Check that the IMFs are valid PDFs
+        """
 
         N = 100000
         shift = (100 - 0.08)/N 
@@ -18,9 +21,11 @@ class TestIMF(unittest.TestCase):
 
         for imf in lh.initial_mass_function.Initial_Mass_Function.__subclasses__():
 
-            weights = imf().get_weight(masses)
+            weights = imf().get_weight(masses, mass_weighted=True)
 
             self.assertAlmostEqual(torch.sum(weights*dm).item(), 1, 3, "Check your IMF normalization!!!")
+
+
 
     def test_continuity(self):
 
@@ -32,7 +37,7 @@ class TestIMF(unittest.TestCase):
 
             print(imf)
 
-            weights = imf().get_weight(masses)
+            weights = imf().get_weight(masses, mass_weighted=True)
 
             delta_weight = weights[1:] - weights[:-1]
 
