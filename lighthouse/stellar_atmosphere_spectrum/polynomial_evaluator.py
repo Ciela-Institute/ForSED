@@ -38,9 +38,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                 self.wavelength         = torch.tensor(coeffs.to_numpy()[:,0], dtype  = torch.float64)
                 self.reference[name]    = torch.tensor(coeffs.to_numpy()[:,1], dtype  = torch.float64)
                 self.coefficients[name] = torch.tensor(coeffs.to_numpy()[:,2:], dtype = torch.float64)
-
+                
     def get_spectrum(self, teff, logg, feh) -> torch.Tensor:
-
         """
         Setting up some boundaries
         """
@@ -75,6 +74,15 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         flux *= self.reference[stellar_type]
 
         return flux
+
+    def to(self, dtype=None, device=None):
+        self.wavelength.to(dtype=dtype, device=device)
+        for key in self.polynomial_powers:
+            self.polynomial_powers[key].to(dtype=dtype, device=device)
+        self.bounds.to(dtype=dtype, device=device)
+        for name in self.reference:
+            self.reference[name].to(dtype=dtype, device=device)
+            self.coefficients[name].to(dtype=dtype, device=device)
 
 
 

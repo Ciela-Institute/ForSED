@@ -61,6 +61,11 @@ class Basic_SSP():
 
         return spectrum
 
+    def to(self, dtype=None, device=None):
+        self.isochrone.to(dtype=dtype, device=device)
+        self.imf.to(dtype=dtype, device=device)
+        self.sas.to(dtype=dtype, device=device)
+
 if __name__ == "__main__":
     from isochrone import MIST
     from initial_mass_function import Kroupa

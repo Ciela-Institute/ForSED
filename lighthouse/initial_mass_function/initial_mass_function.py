@@ -7,4 +7,8 @@ class Initial_Mass_Function(ABC):
 
     @abstractmethod
     def get_weight(self, mass) -> Tensor:
-        pass
+        ...
+
+    @abstractmethod
+    def to(self, dtype=None, device=None):
+        ...

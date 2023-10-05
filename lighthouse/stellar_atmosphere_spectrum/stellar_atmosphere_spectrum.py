@@ -6,6 +6,9 @@ __all__ = ("Stellar_Atmosphere_Spectrum", )
 class Stellar_Atmosphere_Spectrum(ABC):
     @abstractmethod
     def get_spectrum(self, logg, Z, Teff) -> Tensor:
-        pass
+        ...
 
+    @abstractmethod
+    def to(self, dtype=None, device=None):
+        ...
         
