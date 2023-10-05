@@ -19,17 +19,17 @@ __all__ = ("get_mist_isochrones", )
 
 def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.2/{}'):
 
-
     # Collect isochrone data from the internet
     ######################################################################
     import requests
 
     # Path to where MIST data will live
-    directory_path = Path().absolute()
+    directory_path = Path(__file__) #Path().absolute()
     data_path      = Path(directory_path.parent, 'data/MIST/')
 
     # Ensure the directoty exists to place the files
     try:
+        os.mkdir(data_path.parent)
         os.mkdir(data_path)
     except FileExistsError as e:
         pass
