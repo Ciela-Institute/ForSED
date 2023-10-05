@@ -7,3 +7,4 @@ tqdm>=4.65.0
 requests>=2.30.0
 h5py>=3.8.0
 pyyaml>=6.0
+pandas
