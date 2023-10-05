@@ -40,6 +40,11 @@ jobs:
           pip install -e .
           pip show lighthouse
         shell: bash
+      - name: Load Light-House data
+        run: |
+          cd $GITHUB_WORKSPACE/.github/workflows/
+          python get_test_data.py
+        shell: bash
       - name: Test with pytest
         run: |
           cd $GITHUB_WORKSPACE
