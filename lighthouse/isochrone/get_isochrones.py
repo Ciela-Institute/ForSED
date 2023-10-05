@@ -36,7 +36,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
 
     # Specific file path for the requested version of MIST
     file_path = os.path.join(data_path, iso_version)
-
+    print("stuff should go here: ", data_path)
     # Skip download if files already exit
     if not os.path.exists(os.path.splitext(file_path)[0]):
         # Pull the isochrone files from the internet
@@ -47,12 +47,12 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
         print("Writing MIST")
         with open(file_path, 'wb') as f:
             f.write(r.content)
-
+        
         # Extract the tar file into the individual .iso files
         print("Extracting MIST")
         with tarfile.open(file_path) as T:
-            T.extractall(data_path)
-
+            T.extractall(path = data_path)
+        
         # Remove the old tar file, no longer needed
         print("Deleting tar file")
         os.remove(file_path)
