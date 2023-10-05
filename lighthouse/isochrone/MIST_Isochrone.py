@@ -15,7 +15,7 @@ __all__ = ("MIST", )
 class MIST(Isochrone):
 
     def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.0_basic_isos.hdf5'):
-        directory_path = Path(__file__).parent
+        directory_path = Path(__file__)
         data_path      = Path(directory_path.parent, 'data/MIST/')
 
         with h5py.File(os.path.join(data_path, iso_file), 'r') as f:
