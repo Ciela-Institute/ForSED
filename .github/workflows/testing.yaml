@@ -39,7 +39,7 @@ jobs:
       - name: Install Light-House
         run: |
           cd $GITHUB_WORKSPACE/
-          pip install .
+          pip install -e .
           pip show lighthouse
         shell: bash
       - name: Load Light-House data
