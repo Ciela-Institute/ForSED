@@ -46,21 +46,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/.github/workflows/
           python get_test_data.py
-          cd $GITHUB_WORKSPACE/
-          pwd
-          ls
-          cd $GITHUB_WORKSPACE/lighthouse/
-          pwd
-          ls
-          cd $GITHUB_WORKSPACE/lighthouse/isochrone/
-          pwd
-          ls
-          cd $GITHUB_WORKSPACE/lighthouse/isochrone/data/
-          pwd
-          ls
-          cd $GITHUB_WORKSPACE/lighthouse/isochrone/data/MIST/
-          pwd
-          ls
         shell: bash
       - name: Test with pytest
         run: |

@@ -39,7 +39,7 @@ def get_mist_isochrones(saveto = None, iso_version = 'MIST_v1.2_vvcrit0.0_basic_
 
     # Specific file path for the requested version of MIST
     file_path = os.path.join(data_path, iso_version)
-    print("stuff should go here: ", data_path)
+    
     # Skip download if files already exit
     if not os.path.exists(os.path.splitext(file_path)[0]):
         # Pull the isochrone files from the internet
