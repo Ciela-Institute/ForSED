@@ -50,8 +50,8 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
 
         # Extract the tar file into the individual .iso files
         print("Extracting MIST")
-        T = tarfile.open(file_path)
-        T.extractall(data_path)
+        with tarfile.open(file_path) as T:
+            T.extractall(data_path)
 
         # Remove the old tar file, no longer needed
         print("Deleting tar file")
