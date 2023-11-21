@@ -143,7 +143,7 @@ class Basic_SSP():
 
 
         # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
-        spectrum *= utils.light_speed/self.sas.wavelength**2
+        # spectrum *= utils.light_speed/self.sas.wavelength**2
 
         return spectrum
     
