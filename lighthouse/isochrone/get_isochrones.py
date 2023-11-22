@@ -85,12 +85,15 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
     # Go through the isochrone files and collect all the data
     for n, isochrone_file in enumerate(isochrone_files):
 
+        print(isochrone_file, metallicities[n], metallicities_order[n])
+
         isochrone = ISO(isochrone_file, verbose=False)
 
         for x, age in enumerate(isochrone.ages):
             i = isochrone.age_index(age)
 
             track_length = len(isochrone.isos[i]['log_g'])
+
             isochrone_grid[metallicities_order[n], i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
             isochrone_grid[metallicities_order[n], i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
             isochrone_grid[metallicities_order[n], i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
@@ -119,7 +122,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
         data_params.attrs["description"] = "For the parameters axis of the isochrone_grid, this lists the relevant parameters in the correct order"
 
     ## Cleanup
-    #shutil.rmtree(os.path.splitext(file_path)[0])
+    #shutil.rmtree(os.path.splitext(file_path)[0]) # TODO: this should be optional, with the default keeping the .iso files
 
 if __name__=='__main__':
 
