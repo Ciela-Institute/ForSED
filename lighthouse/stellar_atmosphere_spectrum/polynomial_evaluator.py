@@ -17,7 +17,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
     def __init__(self):
 
-        data_path      = Path(os.environ['LightHouse_HOME'], 'data/Villaume2017a/')
+        data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/Villaume2017a/')
 
         self.coefficients = {}
         self.reference    = {}
