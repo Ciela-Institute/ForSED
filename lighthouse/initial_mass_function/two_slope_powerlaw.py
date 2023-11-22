@@ -3,13 +3,18 @@ import torch
 
 from .initial_mass_function import Initial_Mass_Function
 
-__all__ = ("Kroupa", )
+__all__ = ("Two_Slope_Powerlaw", )
 
-class Kroupa(Initial_Mass_Function):
+class Two_Slope_Powerlaw(Initial_Mass_Function):
 
-    def get_imf(self, mass, mass_weighted=False) -> torch.Tensor:
+    """
+    Fixed lower mass cutoff
+    Fixed break 
+    """
 
-        alpha = torch.tensor([1.3, 2.3, 2.3])
+    def get_imf(self, mass, mass_weighted=False, alpha1=1.0, alpah2=1.0) -> torch.Tensor:
+
+        alpha = torch.tensor([alpha1, alpha2, -2.30])
         mass  = torch.tensor(mass)
 
         imf = torch.where(
@@ -28,18 +33,6 @@ class Kroupa(Initial_Mass_Function):
             return imf
 
     
-    def to(self, dtype=None, device=None):
-        pass
-    
-
 if __name__ == "__main__":
 
-    import matplotlib.pyplot as plt
-    K = Kroupa()
-
-    M = torch.linspace(0.1, 100, 1000)
-    IMF = K.get_imf(M)
-
-    plt.plot(torch.log10(M), torch.log10(IMF))
-    plt.show()
-    
+    pass

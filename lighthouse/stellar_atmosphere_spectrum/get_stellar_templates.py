@@ -1,11 +1,11 @@
-import os 
+import os
 from pathlib import Path
 
 __all__ = ("get_polynomial_coefficients_villaume2017a", )
 
 def get_polynomial_coefficients_villaume2017a():
     """
-    
+
     """
 
     import requests
@@ -15,8 +15,8 @@ def get_polynomial_coefficients_villaume2017a():
     stellar_types = ['Cool_Dwarfs', 'Cool_Giants', 'Warm_Dwarfs', 'Warm_Giants', 'Hot_Stars']
 
 
-    directory_path = Path(__file__) #Path().absolute()
-    data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
+    data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/Villaume2017a/')
+
 
     try:
         os.mkdir(data_path.parent)
@@ -33,9 +33,9 @@ def get_polynomial_coefficients_villaume2017a():
             continue
 
 
-        r = requests.get(base_name.format(regime)) 
+        r = requests.get(base_name.format(regime))
         with open(file_path, 'w') as f:
-            f.write(r.text) 
+            f.write(r.text)
 
     C = {}
     C['Cool_Dwarfs'] = [[0,0,0], [1,0,0], [0,1,0], [0,0,1], [0,2,0], [2,0,0], [0,0,2], [1,1,0], [1,0,1], [0,1,1], [0,3,0], [3,0,0], [0,0,3], [2,1,0], [1,2,0], [2,0,1], [4,0,0], [0,4,0], [2,2,0], [3,1,0], [5,0,0]]
@@ -44,7 +44,7 @@ def get_polynomial_coefficients_villaume2017a():
     C['Warm_Giants'] = [[0,0,0], [1,0,0], [0,1,0], [0,0,1], [2,0,0], [0,0,2], [0,2,0], [1,1,0], [1,0,1], [0,1,1], [3,0,0], [0,0,3], [0,3,0], [2,1,0], [1,2,0], [2,0,1], [1,0,2], [4,0,0], [0,4,0], [2,2,0], [2,0,2], [0,2,2], [5,0,0]]
     C['Hot_Stars']   = [[0,0,0], [1,0,0], [0,1,0], [0,0,1], [2,0,0], [0,2,0], [0,0,2], [1,0,1], [1,1,0], [0,1,1], [3,0,0], [0,0,3], [0,3,0], [1,1,1], [2,1,0], [2,0,1], [1,2,0], [0,2,1], [1,0,2], [0,1,2], [4,0,0]]
 
-    with open(os.path.join(data_path, 'polynomial_powers.dat'), "w") as f: 
+    with open(os.path.join(data_path, 'polynomial_powers.dat'), "w") as f:
         f.write(str(C))
 
 
@@ -56,9 +56,9 @@ def get_polynomial_coefficients_villaume2017a():
         "Hot_Stars":   {"surface_gravity": (-0.5, 6),   "effective_temperature": (6000,12000)},
     }
 
-    with open(os.path.join(data_path, 'bounds.dat'), "w") as f: 
+    with open(os.path.join(data_path, 'bounds.dat'), "w") as f:
         f.write(str(B))
-    
 
-if __name__=='__main__': 
+
+if __name__=='__main__':
     get_polynomial_coefficients_villaume2017a()

@@ -17,8 +17,8 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
     def __init__(self):
 
-        directory_path = Path(__file__)
-        data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
+        data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/Villaume2017a/')
+
 
         self.coefficients = {}
         self.reference    = {}
@@ -56,16 +56,16 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         logt = np.log10(teff) - 3.7617
         logg = logg - 4.44
 
-        print(logg2, teff2)
+        # print(logg2, teff2)
         for key, ranges in self.bounds.items():
             if ranges["surface_gravity"][0] <= logg2 <= ranges["surface_gravity"][1] and ranges["effective_temperature"][0] <= teff2 <= ranges["effective_temperature"][1]:
                 stellar_type = key
                 break
         else:
             stellar_type = "Cool_Giants"
-            
-        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), 
-                          torch.as_tensor(feh,  dtype = torch.float64), 
+
+        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64),
+                          torch.as_tensor(feh,  dtype = torch.float64),
                           torch.as_tensor(logg, dtype = torch.float64)))
         PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
         X  = torch.prod(K**PP, dim = -1)
