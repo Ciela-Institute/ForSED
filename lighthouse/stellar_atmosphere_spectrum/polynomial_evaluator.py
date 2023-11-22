@@ -17,7 +17,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
     def __init__(self):
 
-        directory_path = Path(__file__).parent
+        directory_path = Path(__file__)
         data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
 
         self.coefficients = {}

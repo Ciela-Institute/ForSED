@@ -15,10 +15,11 @@ def get_polynomial_coefficients_villaume2017a():
     stellar_types = ['Cool_Dwarfs', 'Cool_Giants', 'Warm_Dwarfs', 'Warm_Giants', 'Hot_Stars']
 
 
-    directory_path = Path().absolute()
+    directory_path = Path(__file__) #Path().absolute()
     data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
 
     try:
+        os.mkdir(data_path.parent)
         os.mkdir(data_path)
     except Exception as e:
         pass
