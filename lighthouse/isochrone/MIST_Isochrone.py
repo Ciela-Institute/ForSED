@@ -26,8 +26,14 @@ class MIST(Isochrone):
 
     def get_isochrone(self, metallicity, age, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
 
-        metallicity_index = (self.metallicities  == metallicity).nonzero(as_tuple=False).squeeze()
-        age_index = (self.ages == age).nonzero(as_tuple=False).squeeze()
+
+        metallicity = torch.tensor(metallicity, dtype = torch.float64)
+        age         = torch.tensor(age, dtype = torch.float64)
+
+        #metallicity_index = (self.metallicities  == metallicity).nonzero(as_tuple=False).squeeze()
+        #age_index = (self.ages == age).nonzero(as_tuple=False).squeeze()
+        metallicity_index = torch.isclose(self.metallicities, metallicity, 1e-2).nonzero(as_tuple=False).squeeze()
+        age_index = torch.isclose(self.ages, age, 1e-5).nonzero(as_tuple=False).squeeze()
 
 
         isochrone = self.isochrone_grid[metallicity_index, age_index].clone() #TODO: do we need to be worried about copy vs deep copy kind of situation here?

@@ -70,45 +70,32 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
         isochrone = ISO(isochrone_file, verbose=False)
 
         metallicities.append(isochrone.abun['[Fe/H]'])
-        ages = [round(x, 2) for x in isochrone.ages]
         for age in isochrone.ages:
             i = isochrone.age_index(age)
             tracklength = len(isochrone.isos[i]['log_g'])
             if longest_track < tracklength:
                 longest_track = tracklength
 
-    #metallicities = np.array(list(sorted(metallicities)))
-    ages          = np.array(ages)
-    isochrone_grid = np.zeros((len(isochrone_files), len(ages), 6, longest_track)) - 999
-    metallicities_order = np.argsort(metallicities)
+    isochrone_grid = np.zeros((len(isochrone_files), isochrone.num_ages, 6, longest_track)) - 999
 
 
     # Go through the isochrone files and collect all the data
     for n, isochrone_file in enumerate(isochrone_files):
 
-        print(isochrone_file, metallicities[n])
-        print(n, metallicities_order[n])
 
         isochrone = ISO(isochrone_file, verbose=False)
-
         for x, age in enumerate(isochrone.ages):
+
             i = isochrone.age_index(age)
 
             track_length = len(isochrone.isos[i]['log_g'])
 
-            #isochrone_grid[metallicities_order[n], i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
-            #isochrone_grid[metallicities_order[n], i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
-            #isochrone_grid[metallicities_order[n], i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
-            #isochrone_grid[metallicities_order[n], i, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
-            #isochrone_grid[metallicities_order[n], i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
-            #isochrone_grid[metallicities_order[n], i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
-
-            isochrone_grid[n, i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
-            isochrone_grid[n, i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
-            isochrone_grid[n, i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
-            isochrone_grid[n, i, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
-            isochrone_grid[n, i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
-            isochrone_grid[n, i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
+            isochrone_grid[n, x, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
+            isochrone_grid[n, x, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
+            isochrone_grid[n, x, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
+            isochrone_grid[n, x, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
+            isochrone_grid[n, x, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
+            isochrone_grid[n, x, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
 
 
     ######################################################################
@@ -116,13 +103,13 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
     with h5py.File(os.path.splitext(file_path)[0] + ".hdf5", 'w') as f:
         # Isochrne grid
         data_iso_grid = f.create_dataset("isochrone_grid", data = isochrone_grid)
-        data_iso_grid.attrs["description"] = "This is a 4D tensor of isochrones orgnaized by: metalicity, age, parameter, track length. Parameter has length 5 and goes by: log_g, Teff, initial_mass, phase, log_L"
+        data_iso_grid.attrs["description"] = "This is a 4D tensor of isochrones orgnaized by: metalicity, age, parameter, track length. Parameter has length 6 and goes by: log_g, Teff, initial_mass, phase, log_L, star_mass"
 
         # Meta data for each axis
         data_metallicities = f.create_dataset("metallicities", data = metallicities)
         data_metallicities.attrs["description"] = "For the metallicity axis of the isochrone_grid, this is the associated matalicities"
 
-        data_ages = f.create_dataset("ages", data = ages)
+        data_ages = f.create_dataset("ages", data = isochrone.ages)
         data_ages.attrs["description"] = "For the ages axis of the isochrone_grid, this is the associated ages"
 
         dt = h5py.special_dtype(vlen=str)
