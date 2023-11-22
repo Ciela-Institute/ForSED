@@ -20,6 +20,10 @@ class Kroupa(Initial_Mass_Function):
 
         return weight
 
+    def to(self, dtype=None, device=None):
+        pass
+    
+
 if __name__ == "__main__":
 
     import matplotlib.pyplot as plt

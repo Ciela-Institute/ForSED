@@ -34,6 +34,11 @@ class MIST(Isochrone):
 
         return dict((p, isochrone[i]) for i, p in enumerate(self.param_order))
 
+    def to(self, dtype=None, device=None):
+        self.isochrone_grid.to(dtype=dtype, device=device)
+        self.metallicities.to(dtype=dtype, device=device)
+        self.ages.to(dtype=dtype, device=device)
+
 if __name__=='__main__':
     test = MIST()
 
