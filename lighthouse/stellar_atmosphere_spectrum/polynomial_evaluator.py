@@ -17,8 +17,7 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
     def __init__(self):
 
-        directory_path = Path(__file__).parent
-        data_path      = Path(directory_path.parent, 'data/Villaume2017a/')
+        data_path      = Path(os.environ['LightHouse_HOME'], 'data/Villaume2017a/')
 
         self.coefficients = {}
         self.reference    = {}
@@ -64,9 +63,9 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
                 break
         else:
             stellar_type = "Cool_Giants"
-            
-        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64), 
-                          torch.as_tensor(feh,  dtype = torch.float64), 
+
+        K  = torch.stack((torch.as_tensor(logt, dtype = torch.float64),
+                          torch.as_tensor(feh,  dtype = torch.float64),
                           torch.as_tensor(logg, dtype = torch.float64)))
         PP = torch.as_tensor(self.polynomial_powers[stellar_type], dtype = torch.float64)
         X  = torch.prod(K**PP, dim = -1)
