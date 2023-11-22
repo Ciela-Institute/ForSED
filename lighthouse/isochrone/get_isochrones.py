@@ -25,8 +25,7 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
     import requests
 
     # Path to where MIST data will live
-    directory_path = Path().absolute()
-    data_path      = Path(directory_path, 'lighthouse/data/MIST/')
+    data_path = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/MIST/')
 
     # Ensure the directoty exists to place the files
     try:
