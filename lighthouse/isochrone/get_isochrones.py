@@ -77,15 +77,17 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
             if longest_track < tracklength:
                 longest_track = tracklength
 
-    metallicities = np.array(list(sorted(metallicities)))
+    #metallicities = np.array(list(sorted(metallicities)))
     ages          = np.array(ages)
     isochrone_grid = np.zeros((len(isochrone_files), len(ages), 6, longest_track)) - 999
     metallicities_order = np.argsort(metallicities)
 
+
     # Go through the isochrone files and collect all the data
     for n, isochrone_file in enumerate(isochrone_files):
 
-        print(isochrone_file, metallicities[n], metallicities_order[n])
+        print(isochrone_file, metallicities[n])
+        print(n, metallicities_order[n])
 
         isochrone = ISO(isochrone_file, verbose=False)
 
@@ -94,12 +96,20 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
 
             track_length = len(isochrone.isos[i]['log_g'])
 
-            isochrone_grid[metallicities_order[n], i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
-            isochrone_grid[metallicities_order[n], i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
-            isochrone_grid[metallicities_order[n], i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
-            isochrone_grid[metallicities_order[n], i, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
-            isochrone_grid[metallicities_order[n], i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
-            isochrone_grid[metallicities_order[n], i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
+            #isochrone_grid[metallicities_order[n], i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
+            #isochrone_grid[metallicities_order[n], i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
+            #isochrone_grid[metallicities_order[n], i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
+            #isochrone_grid[metallicities_order[n], i, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
+            #isochrone_grid[metallicities_order[n], i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
+            #isochrone_grid[metallicities_order[n], i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
+
+            isochrone_grid[n, i, 0][:track_length] = np.array(isochrone.isos[i]['log_g'])
+            isochrone_grid[n, i, 1][:track_length] = np.array(10**isochrone.isos[i]['log_Teff'])
+            isochrone_grid[n, i, 2][:track_length] = np.array(isochrone.isos[i]['initial_mass'])
+            isochrone_grid[n, i, 3][:track_length] = np.array(isochrone.isos[i]['phase'])
+            isochrone_grid[n, i, 4][:track_length] = np.array(isochrone.isos[i]['log_L'])
+            isochrone_grid[n, i, 5][:track_length] = np.array(isochrone.isos[i]['star_mass'])
+
 
     ######################################################################
     print("Writing MIST to hdf5 database")

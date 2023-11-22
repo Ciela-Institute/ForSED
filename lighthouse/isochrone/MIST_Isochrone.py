@@ -26,12 +26,11 @@ class MIST(Isochrone):
 
     def get_isochrone(self, metallicity, age, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
 
+        metallicity_index = (self.metallicities  == metallicity).nonzero(as_tuple=False).squeeze()
+        age_index = (self.ages == age).nonzero(as_tuple=False).squeeze()
 
 
-        metallicity_index = torch.clamp(torch.sum(self.metallicities < metallicity) - 1, 0)
-        age_index = torch.clamp(torch.sum(self.ages < age) - 1, 0) # TODO: figure out a better way later
-
-        isochrone = self.isochrone_grid[metallicity_index, age_index]
+        isochrone = self.isochrone_grid[metallicity_index, age_index].clone() #TODO: do we need to be worried about copy vs deep copy kind of situation here?
         isochrone = isochrone[:,isochrone[3] > -999]
 
         return dict((p, isochrone[i]) for i, p in enumerate(self.param_order))
