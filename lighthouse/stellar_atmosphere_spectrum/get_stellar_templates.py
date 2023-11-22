@@ -17,7 +17,9 @@ def get_polynomial_coefficients_villaume2017a():
 
     data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/Villaume2017a/')
 
+
     try:
+        os.mkdir(data_path.parent)
         os.mkdir(data_path)
     except Exception as e:
         pass

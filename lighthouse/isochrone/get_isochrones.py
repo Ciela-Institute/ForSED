@@ -17,8 +17,7 @@ from .read_mist_models import ISO
 __all__ = ("get_mist_isochrones", )
 
 
-def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.2/{}'):
-
+def get_mist_isochrones(saveto = None, iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url='https://waps.cfa.harvard.edu/MIST/data/tarballs_v1.2/{}'):
 
     # Collect isochrone data from the internet
     ######################################################################
@@ -27,15 +26,17 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
     # Path to where MIST data will live
     data_path = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/MIST/')
 
+
     # Ensure the directoty exists to place the files
     try:
+        os.mkdir(data_path.parent)
         os.mkdir(data_path)
     except FileExistsError as e:
         pass
 
     # Specific file path for the requested version of MIST
     file_path = os.path.join(data_path, iso_version)
-
+    
     # Skip download if files already exit
     if not os.path.exists(os.path.splitext(file_path)[0]):
         # Pull the isochrone files from the internet
@@ -46,12 +47,12 @@ def get_mist_isochrones(iso_version = 'MIST_v1.2_vvcrit0.0_basic_isos.txz', url=
         print("Writing MIST")
         with open(file_path, 'wb') as f:
             f.write(r.content)
-
+        
         # Extract the tar file into the individual .iso files
         print("Extracting MIST")
-        T = tarfile.open(file_path)
-        T.extractall(data_path)
-
+        with tarfile.open(file_path) as T:
+            T.extractall(path = data_path)
+        
         # Remove the old tar file, no longer needed
         print("Deleting tar file")
         os.remove(file_path)

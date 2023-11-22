@@ -17,6 +17,7 @@ class MIST(Isochrone):
     def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.0_basic_isos.hdf5'):
         data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/MIST/')
 
+
         with h5py.File(os.path.join(data_path, iso_file), 'r') as f:
             self.isochrone_grid = torch.tensor(f["isochrone_grid"][:], dtype = torch.float64)
             self.metallicities = torch.tensor(f["metallicities"][:], dtype = torch.float64)
@@ -39,6 +40,11 @@ class MIST(Isochrone):
         isochrone = isochrone[:,isochrone[3] > -999]
 
         return dict((p, isochrone[i]) for i, p in enumerate(self.param_order))
+
+    def to(self, dtype=None, device=None):
+        self.isochrone_grid.to(dtype=dtype, device=device)
+        self.metallicities.to(dtype=dtype, device=device)
+        self.ages.to(dtype=dtype, device=device)
 
 if __name__=='__main__':
     test = MIST()
