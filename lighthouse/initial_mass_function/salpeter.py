@@ -11,11 +11,14 @@ class Salpeter(Initial_Mass_Function):
 
     def get_imf(self, mass, mass_weighted=False) -> torch.Tensor:
 
-        if mass_weighted:
-            return mass*mass**(-2.30)
-        else:
-            return mass**(-2.30) 
+        salpeter_index = torch.tensor(2.35, dtype = torch.float64)
+        imf = mass**(-salpeter_index)
 
+        if mass_weighted:
+            print("mass weighting the IMF")
+            imf = imf*mass
+
+        return imf
 
 
 if __name__ == "__main__":
