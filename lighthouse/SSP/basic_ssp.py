@@ -21,80 +21,62 @@ class Basic_SSP():
         self.imf = imf
         self.sas = sas
 
-        self.isochrone  = None
-        self._tage_normalization = None
-        self.highest_mass = None
-        self.ms_turnoff_point = None
 
-
-    def get_ms_turnoff(self, ms_isochrone):
-
-        turnoff = ms_isochrone["Teff"].argmax()
-
-        xx = -1.0
-        while xx < 0.0:
-            xx = ms_isochrone[turnoff]["log_L"] - ms_isochrone[turnoff-1]["log_L"]
-            if xx < 0.0:
-                turnoff = turnoff - 1
-
-        self.ms_turnoff_point = turnoff
-
-
-    def get_imf_weights(self,  initial_stellar_masses) -> torch.Tensor:
-
-        lower_limit = self.imf.lower_limit
-        upper_limit = self.imf.upper_limit
-
-        weights = torch.zeros(initial_stellar_masses.shape)
-        for i, mass in enumerate(initial_stellar_masses):
-            if initial_stellar_masses[i] < lower_limit or initial_stellar_masses[i] > upper_limit:
-                print("Bounds of isochrone exceed limits of full IMF")
-            if i == 0:
-                m1 = lower_limit
-            else:
-                m1 = initial_stellar_masses[i] - 0.5*(initial_stellar_masses[i] - initial_stellar_masses[i-1])
-            if i == len(initial_stellar_masses) - 1:
-                m2 = initial_stellar_masses[i]
-            else:
-                m2 = initial_stellar_masses[i] + 0.5*(initial_stellar_masses[i+1] - initial_stellar_masses[i])
-
-            if m2 < m1:
-                print("IMF_WEIGHT WARNING: non-monotonic mass!", m1, m2, m2-m1)
-                continue
-
-            if m2 == m1:
-                print("m2 == m1")
-                continue
-
-            tmp, error =  quad(self.imf.get_imf,
-                                m1,
-                                m2,
-                                args=(False,) )
-            weights[i] = tmp
-
-        imf_weight = weights/self.imf.t0_normalization
-
-        return imf_weight
+        self.isochrone    = None
+        self.spectrum     = None
+        self._imf_weights = None
 
 
 
-    def test(self, metalicity, Tage) -> torch.Tensor:
-
-        """
-        Using FSPS as a guide
-        """
-
-        self.isochrone = self.isochrone_grid.get_isochrone(metalicity, Tage)
-
-        log10_imf_weights = torch.log10(self.get_imf_weights(self.isochrone["initial_mass"]))
-
-        return log10_imf_weights
+    @property
+    def imf_weights(self) -> torch.Tensor:
 
 
-    def forward(self, metalicity, Tage) -> torch.Tensor:
 
-        self.isochrone = self.isochrone_grid.get_isochrone(metalicity, Tage)
-        isochrone = self.isochrone
+        if self._imf_weights is None:
+
+            initial_stellar_masses = self.isochrone["initial_mass"]
+
+            lower_limit = self.imf.lower_limit
+            upper_limit = self.imf.upper_limit
+
+            weights = torch.zeros(initial_stellar_masses.shape)
+            for i, mass in enumerate(initial_stellar_masses):
+                if initial_stellar_masses[i] < lower_limit or initial_stellar_masses[i] > upper_limit:
+                    print("Bounds of isochrone exceed limits of full IMF")
+                if i == 0:
+                    m1 = lower_limit
+                else:
+                    m1 = initial_stellar_masses[i] - 0.5*(initial_stellar_masses[i] - initial_stellar_masses[i-1])
+                if i == len(initial_stellar_masses) - 1:
+                    m2 = initial_stellar_masses[i]
+                else:
+                    m2 = initial_stellar_masses[i] + 0.5*(initial_stellar_masses[i+1] - initial_stellar_masses[i])
+
+                if m2 < m1:
+                    print("IMF_WEIGHT WARNING: non-monotonic mass!", m1, m2, m2-m1)
+                    continue
+
+                if m2 == m1:
+                    print("m2 == m1")
+                    continue
+
+                weights[i], error =  quad(self.imf.get_imf,
+                                    m1, m2,
+                                    args=(False,) ) # i.e., not mass-weighting
+
+            self._imf_weights = weights/self.imf.t0_normalization
+
+        return self._imf_weights
+
+
+
+    def spectral_synthesis(self, metalicity, Tage) -> torch.Tensor:
+
+        isochrone   = self.isochrone
+        imf_weights = self.imf_weights
+
+
 
         ## https://waps.cfa.harvard.edu/MIST/README_tables.pdf
         ## FSPS phase type defined as follows:
@@ -105,13 +87,6 @@ class Basic_SSP():
         MS = torch.logical_and(isochrone["phase"] >= 0, isochrone["phase"] <= 2)
         # Horizontal Branch isochrone integration
         HB = torch.logical_and(isochrone["phase"] > 2, isochrone["phase"] <= 5)
-
-        #self.ms_weights = self.imf.get_weight(isochrone["initial_mass"][MS], mass_weighted=False)
-        #self.hb_weights = self.imf.get_weight(isochrone["initial_mass"][HB], mass_weighted=False)
-
-        imf_weights = self.get_imf_weights(self.isochrone["initial_mass"])
-        self.ms_weights = imf_weights[MS]
-        self.hb_weights = imf_weights[HB]
 
 
         ms_spectra = torch.stack(tuple(
@@ -129,10 +104,10 @@ class Basic_SSP():
         spectrum = torch.zeros(ms_spectra.shape[0])
 
         spectrum += torch.vmap(partial(torch.trapz, x = isochrone["initial_mass"][MS])) (
-                        self.ms_weights*ms_spectra
+                                imf_weights[MS]*ms_spectra
                     )
         spectrum += torch.vmap(partial(torch.trapz, x = isochrone["initial_mass"][HB])) (
-                        self.hb_weights*hb_spectra
+                                self.imf_weights[HB]*hb_spectra
                     )
 
 
@@ -143,10 +118,19 @@ class Basic_SSP():
         return spectrum
 
 
-    def plot_isochrone(self, ax):
+    def forward(self, metalicity, Tage, synthesize_spectrum=True) -> torch.Tensor:
 
-        #print(len(self.isochrone["log_g"]  ))
-        ax.plot(self.isochrone["Teff"], self.isochrone["log_g"], label='Light-House', color='r', lw=3)
+        self.isochrone = self.isochrone_grid.get_isochrone(metalicity, Tage)
+
+
+        if synthesize_spectrum:
+            spectrum = self.spectral_synthesis(metalicity, Tage)
+        else:
+            print("HAVE NOT SYNTHEISIZED A SPECTRUM")
+            spectrum = None
+
+
+        return spectrum
 
     def to(self, dtype=None, device=None):
         self.isochrone.to(dtype=dtype, device=device)

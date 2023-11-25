@@ -15,7 +15,6 @@ class Salpeter(Initial_Mass_Function):
         imf = mass**(-salpeter_index)
 
         if mass_weighted:
-            print("mass weighting the IMF")
             imf = imf*mass
 
         return imf
