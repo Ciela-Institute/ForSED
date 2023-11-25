@@ -32,7 +32,6 @@ class Basic_SSP():
     def imf_weights(self) -> torch.Tensor:
 
 
-
         if self._imf_weights is None:
 
             initial_stellar_masses = self.isochrone["initial_mass"]
@@ -121,7 +120,6 @@ class Basic_SSP():
     def forward(self, metalicity, Tage, synthesize_spectrum=True) -> torch.Tensor:
 
         self.isochrone = self.isochrone_grid.get_isochrone(metalicity, Tage)
-
 
         if synthesize_spectrum:
             spectrum = self.spectral_synthesis(metalicity, Tage)
