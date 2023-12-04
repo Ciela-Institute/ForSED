@@ -1,1 +1,1 @@
-light_speed = 2.998e14 # micron s^-1
+light_speed_cgs = 29979245800.0

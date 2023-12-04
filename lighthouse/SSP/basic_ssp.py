@@ -25,11 +25,27 @@ class Basic_SSP():
         self.isochrone    = None
         self.spectrum     = None
         self._imf_weights = None
+        self._imf_weights_v2 = None
+
+
+    @property
+    def imf_weights_v2(self) -> torch.Tensor:
+
+        # like alf
+
+        if self._imf_weights_v2 is None:
+
+            weights = self.imf.get_imf(self.isochrone["initial_mass"], mass_weighted=False)
+            self._imf_weights_v2 = weights/self.imf.t0_normalization
+
+        return self._imf_weights_v2
 
 
 
     @property
     def imf_weights(self) -> torch.Tensor:
+
+        # like fsps
 
 
         if self._imf_weights is None:
@@ -44,7 +60,7 @@ class Basic_SSP():
                 if initial_stellar_masses[i] < lower_limit or initial_stellar_masses[i] > upper_limit:
                     print("Bounds of isochrone exceed limits of full IMF")
                 if i == 0:
-                    m1 = lower_limit
+                    m1 = lower_limit # ala fsps aka
                 else:
                     m1 = initial_stellar_masses[i] - 0.5*(initial_stellar_masses[i] - initial_stellar_masses[i-1])
                 if i == len(initial_stellar_masses) - 1:
@@ -70,10 +86,11 @@ class Basic_SSP():
 
 
 
-    def spectral_synthesis(self, metalicity, Tage) -> torch.Tensor:
+    def spectral_synthesis(self, metalicity, Tage, peraa=True) -> torch.Tensor:
 
         isochrone   = self.isochrone
-        imf_weights = self.imf_weights
+        imf_weights = self.imf_weights_v2
+        #imf_weights = self.imf_weights
 
 
 
@@ -111,8 +128,9 @@ class Basic_SSP():
 
 
 
-        # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
-        # spectrum *= utils.light_speed/self.sas.wavelength**2
+        if peraa:
+            # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
+            spectrum *= utils.light_speed_cgs/self.sas.wavelength**2
 
         return spectrum
 
