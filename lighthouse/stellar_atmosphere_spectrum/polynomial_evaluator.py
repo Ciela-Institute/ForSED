@@ -71,7 +71,6 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
 
         # Normalizing to solar values
         logt = np.log10(teff2) - 3.7617
-        #logt = np.log10(teff) - 3.7617
         logg = logg - 4.44
 
         for key, ranges in self.bounds.items():
