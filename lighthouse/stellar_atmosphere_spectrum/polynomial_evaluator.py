@@ -46,16 +46,16 @@ class PolynomialEvaluator(Stellar_Atmosphere_Spectrum):
         smooth behavior.
         """
         # Overlap of cool dwarf and warm dwarf training sets
-        d_teff_overlap = np.linspace(3000, 5500, num=100)
-        d_weights = np.linspace(1, 0, num=100)
+        d_teff_overlap = torch.linspace(3000, 5500, steps=100)
+        d_weights = torch.linspace(1, 0, steps=100)
 
         # Overlap of warm giant and hot star training sets
-        gh_teff_overlap = np.linspace(5500, 6500, num=100)
-        gh_weights = np.linspace(1, 0, num=100)
+        gh_teff_overlap = torch.linspace(5500, 6500, steps=100)
+        gh_weights = torch.linspace(1, 0, steps=100)
 
         # Overlap of warm giant and cool giant training sets
-        gc_teff_overlap = np.linspace(3500, 4500, num=100)
-        gc_weights = np.linspace(1, 0, num=100)
+        gc_teff_overlap = torch.linspace(3500, 4500, steps=100)
+        gc_weights = torch.linspace(1, 0, steps=100)
 
 
 
