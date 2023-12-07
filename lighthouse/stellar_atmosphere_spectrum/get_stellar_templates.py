@@ -49,11 +49,17 @@ def get_polynomial_coefficients_villaume2017a():
 
 
     B = {
-        "Cool_Dwarfs": {"surface_gravity": (4.0, 6.0),  "effective_temperature": (2500,4000)},
-        "Cool_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (2500,4000)},
-        "Warm_Dwarfs": {"surface_gravity": (4.0, 6.0),  "effective_temperature": (4000,6000)},
-        "Warm_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (4000,6000)},
-        "Hot_Stars":   {"surface_gravity": (-0.5, 6),   "effective_temperature": (6000,12000)},
+        "Cool_Giants":    {"surface_gravity": (-0.5, 4.0), "effective_temperature": (2500,4000)},
+        "Warm_Giants":    {"surface_gravity": (-0.5, 4.0), "effective_temperature": (4500,5500)},
+        "Hottish_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (5500,6500)},
+        "Coolish_Giants": {"surface_gravity": (-0.5, 4.0), "effective_temperature": (3500,4500)},
+
+        "Cool_Dwarfs":    {"surface_gravity": (4.0, 10.0),  "effective_temperature": (2500,3000)},
+        "Warm_Dwarfs":    {"surface_gravity": (4.0, 10.0),  "effective_temperature": (5500,6000)},
+        "Coolish_Dwarfs": {"surface_gravity": (4.0, 10.0),  "effective_temperature": (3000,5500)},
+
+        "Hot_Giants":     {"surface_gravity": (-0.5, 4.0),   "effective_temperature": (6500,12000)},
+        "Hot_Dwarfs":     {"surface_gravity": (4.0, 10.0),   "effective_temperature": (6000,12000)},
     }
 
     with open(os.path.join(data_path, 'bounds.dat'), "w") as f:
