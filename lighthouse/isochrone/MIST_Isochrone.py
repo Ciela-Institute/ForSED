@@ -35,8 +35,14 @@ class MIST(Isochrone):
 
 
         isochrone = self.isochrone_grid[metallicity_index, age_index].clone() #TODO: do we need to be worried about copy vs deep copy kind of situation here?
+        bad_phase_mask = ( (isochrone[3] != 3) & (isochrone[3] != 4) & (isochrone[3] != 5) & (isochrone[3] != 6)  )
+        isochrone = isochrone[:, bad_phase_mask]
+
         bad_values = (isochrone[3] > -999)
         isochrone = isochrone[:, bad_values]
+
+        #[print(p) for p in isochrone[3]]
+
 
         return dict((p, isochrone[i]) for i, p in enumerate(self.param_order))
 
