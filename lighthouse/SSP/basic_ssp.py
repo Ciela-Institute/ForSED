@@ -86,7 +86,7 @@ class Basic_SSP():
 
 
 
-    def spectral_synthesis(self, metalicity, Tage, peraa=True) -> torch.Tensor:
+    def spectral_synthesis(self, metalicity, Tage) -> torch.Tensor:
 
         isochrone   = self.isochrone
         imf_weights = self.imf_weights_v2
@@ -129,7 +129,8 @@ class Basic_SSP():
 
 
         # SSP in L_sun Hz^-1, CvD models in L_sun micron^-1, convert
-        spectrum *= utils.light_speed_cgs/self.sas.wavelength**2
+        spectrum *= utils.light_speed_micron/self.sas.wavelength**2 #for detailed comparisons to alf
+        #spectrum *= utils.light_speed_cgs/self.sas.wavelength**2 # the correct thing to do;consistent normalization with fsps
 
         return spectrum
 
