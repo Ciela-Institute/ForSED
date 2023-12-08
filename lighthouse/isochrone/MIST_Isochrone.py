@@ -21,17 +21,30 @@ class MIST(Isochrone):
         with h5py.File(os.path.join(data_path, iso_file), 'r') as f:
             self.isochrone_grid = torch.tensor(f["isochrone_grid"][:], dtype = torch.float64)
             self.metallicities = torch.tensor(f["metallicities"][:], dtype = torch.float64)
-            self.ages = torch.tensor(f["ages"][:], dtype = torch.float64)
+            self.log10ages = torch.tensor(f["ages"][:], dtype = torch.float64)
             self.param_order = list(p.decode("UTF-8") for p in f["parameters"][:])
 
     def get_isochrone(self, metallicity, age, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
 
+        age_step = torch.tensor(0.05, dtype=torch.float64)
 
         metallicity = torch.tensor(metallicity, dtype = torch.float64)
         age         = torch.tensor(age, dtype = torch.float64)
 
+
+
+
+
         metallicity_index = torch.isclose(self.metallicities, metallicity, 1e-2).nonzero(as_tuple=False).squeeze()
-        age_index = torch.isclose(self.ages, age, 1e-5).nonzero(as_tuple=False).squeeze()
+
+        print(torch.log10(age))
+        tmp = torch.ceil(torch.log10(age) / age_step)
+        age = tmp*age_step
+
+        print(age)
+        print(self.log10ages)
+        print(torch.isclose(self.log10ages, age, 1e-3) )
+        age_index = torch.isclose(self.log10ages, age, 1e-3).nonzero(as_tuple=False).squeeze()
 
 
         isochrone = self.isochrone_grid[metallicity_index, age_index].clone() #TODO: do we need to be worried about copy vs deep copy kind of situation here?
