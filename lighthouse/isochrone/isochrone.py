@@ -11,3 +11,17 @@ class Isochrone(ABC):
     @abstractmethod
     def to(self, dtype=None, device=None):
         ...
+
+
+
+
+
+
+
+    def write_isochrone(self):
+        pass
+
+
+    def plot_isochrone(self, ax):
+
+        ax.plot(self.isochrone["Teff"], self.isochrone["log_g"], label='Light-House', color='r', lw=3)

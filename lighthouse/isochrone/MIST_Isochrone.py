@@ -14,23 +14,45 @@ __all__ = ("MIST", )
 
 class MIST(Isochrone):
 
-    def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.0_basic_isos.hdf5'):
-        directory_path = Path(__file__)
-        data_path      = Path(directory_path.parent, 'data/MIST/')
+    def __init__(self, iso_file = 'MIST_v1.2_vvcrit0.4_basic_isos.hdf5'):
+        data_path      = Path(os.environ['LightHouse_HOME'], 'lighthouse/data/MIST/')
+
 
         with h5py.File(os.path.join(data_path, iso_file), 'r') as f:
             self.isochrone_grid = torch.tensor(f["isochrone_grid"][:], dtype = torch.float64)
             self.metallicities = torch.tensor(f["metallicities"][:], dtype = torch.float64)
-            self.ages = torch.tensor(f["ages"][:], dtype = torch.float64)
+            self.log10ages = torch.tensor(f["ages"][:], dtype = torch.float64)
             self.param_order = list(p.decode("UTF-8") for p in f["parameters"][:])
 
     def get_isochrone(self, metallicity, age, *args, low_m_limit = 0.08, high_m_limit = 100) -> dict:
 
-        metallicity_index = torch.clamp(torch.sum(self.metallicities < metallicity) - 1, 0) 
-        age_index = torch.clamp(torch.sum(self.ages < age) - 1, 0) # TODO: figure out a better way later
+        age_step = torch.tensor(0.05, dtype=torch.float64)
 
-        isochrone = self.isochrone_grid[metallicity_index, age_index]
-        isochrone = isochrone[:,isochrone[3] > -999]
+        metallicity = torch.tensor(metallicity, dtype = torch.float64)
+        age         = torch.tensor(age, dtype = torch.float64)
+
+
+
+
+
+        metallicity_index = torch.isclose(self.metallicities, metallicity, 1e-2).nonzero(as_tuple=False).squeeze()
+
+        print(torch.log10(age))
+        tmp = torch.ceil(torch.log10(age) / age_step)
+        age = tmp*age_step
+
+        print(age)
+        print(self.log10ages)
+        print(torch.isclose(self.log10ages, age, 1e-3) )
+        age_index = torch.isclose(self.log10ages, age, 1e-3).nonzero(as_tuple=False).squeeze()
+
+
+        isochrone = self.isochrone_grid[metallicity_index, age_index].clone() #TODO: do we need to be worried about copy vs deep copy kind of situation here?
+        bad_phase_mask = (  (isochrone[3] != 6) & (isochrone[2] >= low_m_limit) & (isochrone[2] <= high_m_limit) )
+        isochrone = isochrone[:, bad_phase_mask]
+
+        bad_values = (isochrone[3] > -999)
+        isochrone = isochrone[:, bad_values]
 
         return dict((p, isochrone[i]) for i, p in enumerate(self.param_order))
 
