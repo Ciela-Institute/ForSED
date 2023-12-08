@@ -36,7 +36,9 @@ class Basic_SSP():
         if self._imf_weights_v2 is None:
 
             weights = self.imf.get_imf(self.isochrone["initial_mass"], mass_weighted=False)
-            self._imf_weights_v2 = weights/self.imf.t0_normalization
+            weights = weights/self.imf.t0_normalization
+
+            self._imf_weights_v2 = weights
 
         return self._imf_weights_v2
 
@@ -90,8 +92,6 @@ class Basic_SSP():
 
         isochrone   = self.isochrone
         imf_weights = self.imf_weights_v2
-        #imf_weights = self.imf_weights
-
 
 
         ## https://waps.cfa.harvard.edu/MIST/README_tables.pdf
@@ -123,7 +123,7 @@ class Basic_SSP():
                                 imf_weights[MS]*ms_spectra
                     )
         spectrum += torch.vmap(partial(torch.trapz, x = isochrone["initial_mass"][HB])) (
-                                self.imf_weights[HB]*hb_spectra
+                                imf_weights[HB]*hb_spectra
                     )
 
 
