@@ -26,7 +26,7 @@ class Initial_Mass_Function(ABC):
 
 
     @property
-    def t0_normalization(self):
+    def t0_normalization(self): ## TODO: change this name
 
         if self._t0_normalization is None:
             self._t0_normalization = quad(self.get_imf,
